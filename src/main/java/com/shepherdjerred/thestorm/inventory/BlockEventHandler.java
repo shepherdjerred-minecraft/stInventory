@@ -20,6 +20,7 @@ public class BlockEventHandler implements Listener {
         var replacementItemIndex = replacementItemIndexOptional.get();
         var replacementItem = event.getPlayer().getInventory().getItem(replacementItemIndex);
         event.getPlayer().getInventory().setItem(handIndex, replacementItem);
+        event.getPlayer().getInventory().setItem(replacementItemIndex, null);
         event.getPlayer().sendMessage("Refilled inventory");
       }
     }
