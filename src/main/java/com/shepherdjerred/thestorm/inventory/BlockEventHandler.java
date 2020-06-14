@@ -1,46 +1,34 @@
 package com.shepherdjerred.thestorm.inventory;
 
-import java.util.Optional;
-import org.bukkit.entity.Player;
+import lombok.extern.log4j.Log4j2;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
+@Log4j2
 public class BlockEventHandler implements Listener {
 
   @EventHandler
   public void onBlockPlace(BlockPlaceEvent event) {
-    var handIndex = getHeldItemSlot(event.getPlayer());
-    var willBeEmpty = event.getItemInHand().getAmount() == 1;
-    if (willBeEmpty && !event.isCancelled()) {
-      var replacementItemIndexOptional = getReplacementItemSlot(event.getPlayer(), handIndex);
-      if (replacementItemIndexOptional.isEmpty()) {
-        event.getPlayer().sendMessage("Can't refill inventory");
+    var willHandBeEmpty = event.getItemInHand().getAmount() == 1;
+    if (willHandBeEmpty && !event.isCancelled() && event.canBuild()) {
+      var matcher = new Matcher();
+      var inventory = event.getPlayer().getInventory();
+      var hand = event.getHand();
+      var item = inventory.getItem(hand);
+      var possibleItemMatch = matcher.findMatch(inventory, item);
+
+      if (possibleItemMatch.isPresent()) {
+        var itemMatch = possibleItemMatch.get();
+        // We overwrite the original item stack, so we add one which will be removed when the block is actually placed.
+        itemMatch.setAmount(item.getAmount() + 1);
+        inventory.setItem(hand, itemMatch);
+        log.info("Replaced item");
+        event.getPlayer().sendMessage("Replaced item");
       } else {
-        var replacementItemIndex = replacementItemIndexOptional.get();
-        var replacementItem = event.getPlayer().getInventory().getItem(replacementItemIndex);
-        event.getPlayer().getInventory().setItem(handIndex, replacementItem);
-        event.getPlayer().getInventory().setItem(replacementItemIndex, null);
-        event.getPlayer().sendMessage("Refilled inventory");
+        log.info("Could not replace item");
+        event.getPlayer().sendMessage("Could not replace item");
       }
     }
-  }
-
-  private int getHeldItemSlot(Player player) {
-    return player.getInventory().getHeldItemSlot();
-  }
-
-  private Optional<Integer> getReplacementItemSlot(Player player, int slot) {
-    var itemInHand = player.getInventory().getItem(slot).getData().getItemType();
-    for (int iSlot = 0; iSlot < player.getInventory().getSize(); iSlot++) {
-      var item = player.getInventory().getItem(iSlot);
-      if (item != null) {
-        var itemType = item.getType();
-        if (itemInHand == itemType) {
-          return Optional.of(iSlot);
-        }
-      }
-    }
-    return Optional.empty();
   }
 }
