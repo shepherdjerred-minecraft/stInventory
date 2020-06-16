@@ -1,33 +1,38 @@
 package com.shepherdjerred.thestorm.inventory;
 
+import static org.bukkit.event.EventPriority.MONITOR;
+
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 @Log4j2
+@AllArgsConstructor
 public class BlockEventHandler implements Listener {
 
-  @EventHandler
+  private final ItemRemover itemRemover;
+  private final ItemMatcher itemMatcher;
+
+  @EventHandler(priority = MONITOR, ignoreCancelled = true)
   public void onBlockPlace(BlockPlaceEvent event) {
     var willHandBeEmpty = event.getItemInHand().getAmount() == 1;
     if (willHandBeEmpty && !event.isCancelled() && event.canBuild()) {
-      var matcher = new Matcher();
       var inventory = event.getPlayer().getInventory();
       var hand = event.getHand();
-      var item = inventory.getItem(hand);
-      var possibleItemMatch = matcher.findMatch(inventory, item);
+      var heldItem = inventory.getItem(hand);
+      var possibleItemMatch = itemMatcher.findMatch(inventory, heldItem);
 
       if (possibleItemMatch.isPresent()) {
         var itemMatch = possibleItemMatch.get();
-        // We overwrite the original item stack, so we add one which will be removed when the block is actually placed.
-        itemMatch.setAmount(item.getAmount() + 1);
+        log.info("Matched {}", itemMatch);
+        itemRemover.removeItem(inventory, itemMatch, hand);
+        log.info("Removed item");
         inventory.setItem(hand, itemMatch);
-        log.info("Replaced item");
-        event.getPlayer().sendMessage("Replaced item");
+        log.info("Replaced {} with {}", heldItem, itemMatch);
       } else {
         log.info("Could not replace item");
-        event.getPlayer().sendMessage("Could not replace item");
       }
     }
   }

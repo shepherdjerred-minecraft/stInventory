@@ -6,6 +6,6 @@ public class Main extends JavaPlugin {
 
   @Override
   public void onEnable() {
-    getServer().getPluginManager().registerEvents(new BlockEventHandler(), this);
+    getServer().getPluginManager().registerEvents(new BlockEventHandler(new ItemRemover(), new ItemMatcher()), this);
   }
 }
