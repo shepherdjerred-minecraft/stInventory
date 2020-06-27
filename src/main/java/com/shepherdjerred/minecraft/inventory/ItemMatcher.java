@@ -1,4 +1,4 @@
-package com.shepherdjerred.thestorm.inventory;
+package com.shepherdjerred.minecraft.inventory;
 
 import java.util.Arrays;
 import java.util.Comparator;

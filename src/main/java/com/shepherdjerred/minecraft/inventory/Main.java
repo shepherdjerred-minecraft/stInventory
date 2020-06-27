@@ -1,4 +1,4 @@
-package com.shepherdjerred.thestorm.inventory;
+package com.shepherdjerred.minecraft.inventory;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
