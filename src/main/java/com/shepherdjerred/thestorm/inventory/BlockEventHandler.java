@@ -11,17 +11,25 @@ import org.bukkit.event.block.BlockPlaceEvent;
 @Log4j2
 @AllArgsConstructor
 public class BlockEventHandler implements Listener {
-
   private final ItemRemover itemRemover;
   private final ItemMatcher itemMatcher;
 
   @EventHandler(priority = MONITOR, ignoreCancelled = true)
   public void onBlockPlace(BlockPlaceEvent event) {
+    var inventory = event.getPlayer().getInventory();
+    var hand = event.getHand();
+    var heldItem = inventory.getItem(hand);
+
+    if (event.getBlockPlaced().getBlockData().getMaterial() != heldItem.getType()) {
+      return;
+    }
+
+    if (event.isCancelled()) {
+      return;
+    }
+
     var willHandBeEmpty = event.getItemInHand().getAmount() == 1;
-    if (willHandBeEmpty && !event.isCancelled() && event.canBuild()) {
-      var inventory = event.getPlayer().getInventory();
-      var hand = event.getHand();
-      var heldItem = inventory.getItem(hand);
+    if (willHandBeEmpty && event.canBuild()) {
       var possibleItemMatch = itemMatcher.findMatch(inventory, heldItem);
 
       if (possibleItemMatch.isPresent()) {

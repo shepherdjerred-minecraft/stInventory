@@ -31,12 +31,12 @@ public class ItemMatcher {
    */
   private Optional<ItemStack> findExactMatch(Inventory inventory, ItemStack itemStack) {
     var matches = Arrays
-        .stream(inventory.getContents())
-        .filter(Objects::nonNull)
-        .filter(inventoryItemStack -> inventoryItemStack.getData() != null)
-        .filter(inventoryItemStack -> inventoryItemStack.isSimilar(itemStack))
-        .sorted(Comparator.comparingInt(ItemStack::getAmount))
-        .collect(Collectors.toList());
+      .stream(inventory.getContents())
+      .filter(Objects::nonNull)
+      .filter(inventoryItemStack -> inventoryItemStack.getData() != null)
+      .filter(inventoryItemStack -> inventoryItemStack.isSimilar(itemStack))
+      .sorted(Comparator.comparingInt(ItemStack::getAmount))
+      .collect(Collectors.toList());
 
     // An item stack will should match with itself, so remove it.
     matches.remove(itemStack);
@@ -58,13 +58,12 @@ public class ItemMatcher {
     }
 
     var matches = Arrays
-        .stream(inventory.getContents())
-        .filter(Objects::nonNull)
-        .filter(inventoryItemStack -> inventoryItemStack.getData() != null)
-        .filter(inventoryItemStack -> inventoryItemStack.getData().getItemType()
-            == itemStack.getData().getItemType())
-        .sorted(Comparator.comparingInt(ItemStack::getAmount))
-        .collect(Collectors.toList());
+      .stream(inventory.getContents())
+      .filter(Objects::nonNull)
+      .filter(inventoryItemStack -> inventoryItemStack.getData() != null)
+      .filter(inventoryItemStack -> inventoryItemStack.getData().getItemType() == itemStack.getData().getItemType())
+      .sorted(Comparator.comparingInt(ItemStack::getAmount))
+      .collect(Collectors.toList());
 
     // An item stack should always match with itself, so remove it.
     matches.remove(itemStack);
