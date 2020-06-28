@@ -1,6 +1,7 @@
 package com.shepherdjerred.minecraft.inventory;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -51,12 +52,15 @@ public class ItemMatcher {
       .filter(Objects::nonNull)
       .filter(inventoryItemStack -> inventoryItemStack.getData() != null)
       .filter(inventoryItemStack -> inventoryItemStack.isSimilar(itemStack))
-      .collect(Collectors.toUnmodifiableList());
+      .collect(Collectors.toList());
 
+    /*
+     * TODO: refactor. this is a little surprising since the method removes the item that it is matching with.
+     */
     // An item stack should match with itself, so remove it.
     matches.remove(itemStack);
 
-    return matches;
+    return Collections.unmodifiableList(matches);
   }
 
   /**
@@ -69,11 +73,11 @@ public class ItemMatcher {
       .filter(Objects::nonNull)
       .filter(inventoryItemStack -> inventoryItemStack.getData() != null)
       .filter(inventoryItemStack -> inventoryItemStack.getData().getItemType() == itemStack.getData().getItemType())
-      .collect(Collectors.toUnmodifiableList());
+      .collect(Collectors.toList());
 
     // An item stack should always match with itself, so remove it.
     matches.remove(itemStack);
 
-    return matches;
+    return Collections.unmodifiableList(matches);
   }
 }

@@ -23,7 +23,6 @@ public class PlayerInteractEntityEventHandler implements Listener {
     var heldItem = inventory.getItem(hand);
 
     var willHandBeEmpty = inventory.getItem(hand).getAmount() == 1;
-
     if (willHandBeEmpty) {
       var possibleItemMatch = itemMatcher.findMatch(inventory, heldItem);
 

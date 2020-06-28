@@ -1,12 +1,11 @@
 package com.shepherdjerred.minecraft.inventory;
 
 import com.shepherdjerred.minecraft.inventory.event.BlockEventHandler;
-import com.shepherdjerred.minecraft.inventory.event.PlayerInteractEntityEventHandler;
-import com.shepherdjerred.minecraft.inventory.event.PlayerItemBreakEventHandler;
 import java.util.HashSet;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+@SuppressWarnings(value = "unused")
 public class Main extends JavaPlugin {
 
   @Override
@@ -18,8 +17,8 @@ public class Main extends JavaPlugin {
 
     var eventHandlers = new HashSet<Listener>();
     eventHandlers.add(new BlockEventHandler(itemReplacer, itemMatcher));
-    eventHandlers.add(new PlayerInteractEntityEventHandler(itemReplacer, itemMatcher));
-    eventHandlers.add(new PlayerItemBreakEventHandler(itemReplacer, itemMatcher, itemFinder));
+    //    eventHandlers.add(new PlayerInteractEntityEventHandler(itemReplacer, itemMatcher));
+    //    eventHandlers.add(new PlayerItemBreakEventHandler(itemReplacer, itemMatcher, itemFinder));
 
     eventHandlers.forEach(handler -> getServer().getPluginManager().registerEvents(handler, this));
   }
