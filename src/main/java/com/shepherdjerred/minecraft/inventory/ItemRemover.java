@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import lombok.extern.log4j.Log4j2;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -30,7 +31,7 @@ public class ItemRemover {
     removeItem(inventory, itemStack, ignoreList);
   }
 
-  public void removeItem(PlayerInventory inventory, ItemStack itemStack, Set<Integer> slotIndexesToIgnore) {
+  public void removeItem(Inventory inventory, ItemStack itemStack, Set<Integer> slotIndexesToIgnore) {
     log.info("Ignored slots: {}", slotIndexesToIgnore);
     for (int index = 0; index < inventory.getSize(); index++) {
       if (!slotIndexesToIgnore.contains(index)) {

@@ -2,6 +2,7 @@ package com.shepherdjerred.minecraft.inventory;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,60 +19,61 @@ public class ItemMatcher {
     if (itemStack.getData() == null) {
       return Optional.empty();
     }
-    var exactMatches = findExactMatch(inventory, itemStack);
-    if (exactMatches.isPresent()) {
+    var matches = findBestMatchesSortedBySize(inventory, itemStack);
+    if (matches.isEmpty()) {
+      return Optional.empty();
+    } else {
+      return Optional.of(matches.get(0));
+    }
+  }
+
+  private List<ItemStack> findBestMatchesSortedBySize(Inventory inventory, ItemStack itemStack) {
+    var bestMatches = findBestMatches(inventory, itemStack);
+    return bestMatches.stream().sorted(Comparator.comparingInt(ItemStack::getAmount).reversed()).collect(Collectors.toUnmodifiableList());
+  }
+
+  private List<ItemStack> findBestMatches(Inventory inventory, ItemStack itemStack) {
+    var exactMatches = findExactMatches(inventory, itemStack);
+    if (exactMatches.isEmpty()) {
+      return findLooseMatches(inventory, itemStack);
+    } else {
       return exactMatches;
     }
-    return findLooseMatch(inventory, itemStack);
   }
 
   /**
    * Find a strict match ignoring stack size. An exact match tries to find an identical item
    * ignoring stack size. This takes into account this like enchantments and item metadata.
    */
-  private Optional<ItemStack> findExactMatch(Inventory inventory, ItemStack itemStack) {
+  private List<ItemStack> findExactMatches(Inventory inventory, ItemStack itemStack) {
     var matches = Arrays
       .stream(inventory.getContents())
       .filter(Objects::nonNull)
       .filter(inventoryItemStack -> inventoryItemStack.getData() != null)
       .filter(inventoryItemStack -> inventoryItemStack.isSimilar(itemStack))
-      .sorted(Comparator.comparingInt(ItemStack::getAmount))
-      .collect(Collectors.toList());
+      .collect(Collectors.toUnmodifiableList());
 
-    // An item stack will should match with itself, so remove it.
+    // An item stack should match with itself, so remove it.
     matches.remove(itemStack);
 
-    if (matches.size() > 0) {
-      return Optional.of(matches.get(0));
-    } else {
-      return Optional.empty();
-    }
+    return matches;
   }
 
   /**
    * Find a loose match ignoring stack size. A loose match just tries to find an item based on
    * material type. This ignores things likes enchantments or item metadata.
    */
-  private Optional<ItemStack> findLooseMatch(Inventory inventory, ItemStack itemStack) {
-    if (itemStack.getData() == null) {
-      return Optional.empty();
-    }
-
+  private List<ItemStack> findLooseMatches(Inventory inventory, ItemStack itemStack) {
     var matches = Arrays
       .stream(inventory.getContents())
       .filter(Objects::nonNull)
       .filter(inventoryItemStack -> inventoryItemStack.getData() != null)
       .filter(inventoryItemStack -> inventoryItemStack.getData().getItemType() == itemStack.getData().getItemType())
-      .sorted(Comparator.comparingInt(ItemStack::getAmount))
-      .collect(Collectors.toList());
+      .collect(Collectors.toUnmodifiableList());
 
     // An item stack should always match with itself, so remove it.
     matches.remove(itemStack);
 
-    if (matches.size() > 0) {
-      return Optional.of(matches.get(0));
-    } else {
-      return Optional.empty();
-    }
+    return matches;
   }
 }
